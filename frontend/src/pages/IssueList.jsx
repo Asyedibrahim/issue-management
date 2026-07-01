@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FaSearch, FaSpinner, FaFilter, FaEdit, FaTrash, FaInbox } from 'react-icons/fa';
+import { FaSearch, FaSpinner, FaFilter, FaEdit, FaTrash, FaInbox, FaChevronDown } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import CreateIssueModal from '../ui/CreateIssueModal';
 import EditIssueModal from '../ui/EditIssueModal';
 import { MdOutlineTrackChanges } from 'react-icons/md';
+import IssueDetailModal from '../ui/IssueDetailModal';
 
 const IssueList = () => {
 
@@ -42,6 +43,15 @@ const IssueList = () => {
     });
     const [saving, setSaving] = useState(false);
 
+    // Detail view
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectedIssue, setSelectedIssue] = useState(null);
+    const [loadingDetail, setLoadingDetail] = useState(false);
+
+    // Status dropdown
+    const [statusDropdownOpen, setStatusDropdownOpen] = useState(null);
+    const [updatingStatus, setUpdatingStatus] = useState(null);
+
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
@@ -60,6 +70,8 @@ const IssueList = () => {
         Medium: "bg-orange-50 text-orange-600",
         Low: "bg-blue-50 text-blue-600",
     };
+
+    const statusOptions = ['Open', 'In Progress', 'Resolved'];
 
     const fetchCategories = async () => {
         try {
@@ -174,6 +186,47 @@ const IssueList = () => {
             toast.error('Failed to update issue');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleStatusUpdate = async (issueId, newStatus) => {
+        if (updatingStatus === issueId) return;
+
+        setUpdatingStatus(issueId);
+        try {
+            const response = await axios.patch(`/api/issue/issue-status/${issueId}`, {
+                status: newStatus
+            });
+
+            if (response.status === 200) {
+                toast.success(`Status updated to ${newStatus}`);
+                await fetchIssues();
+                setStatusDropdownOpen(null);
+            } else {
+                toast.error('Failed to update status');
+            }
+        } catch (err) {
+            console.error('Error updating status:', err);
+            toast.error('Failed to update status');
+        } finally {
+            setUpdatingStatus(null);
+        }
+    };
+
+    const handleRowClick = async (issue) => {
+        setLoadingDetail(true);
+        setSelectedIssue(null);
+        setShowDetailModal(true);
+
+        try {
+            const response = await axios.get(`/api/issue/get/${issue._id}`);
+            setSelectedIssue(response.data.issue);
+        } catch (err) {
+            console.error('Error fetching issue details:', err);
+            toast.error('Failed to load issue details');
+            setShowDetailModal(false);
+        } finally {
+            setLoadingDetail(false);
         }
     };
 
@@ -350,7 +403,11 @@ const IssueList = () => {
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
                                     {issues.map((issue, index) => (
-                                        <tr key={issue._id} className="hover:bg-gray-50 transition-colors">
+                                        <tr
+                                            key={issue._id}
+                                            className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                            onClick={() => handleRowClick(issue)}
+                                        >
                                             <td className="px-4 py-3 text-gray-400">{(currentPage - 1) * 30 + index + 1}</td>
                                             <td className="px-4 py-3 font-medium text-gray-800 max-w-[220px] truncate">
                                                 {issue.title}
@@ -369,10 +426,43 @@ const IssueList = () => {
                                             <td className="px-4 py-3 text-gray-600">
                                                 {issue.reportedBy || '—'}
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${statusBadge[issue.status] || "bg-gray-100 text-gray-700"}`}>
-                                                    {issue.status}
-                                                </span>
+                                            <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                                                {/* Status Dropdown */}
+                                                <div className="relative">
+                                                    <button
+                                                        onClick={() => setStatusDropdownOpen(
+                                                            statusDropdownOpen === issue._id ? null : issue._id
+                                                        )}
+                                                        className={`px-2.5 py-1 text-xs font-semibold rounded-full flex items-center gap-1.5 transition-colors ${statusBadge[issue.status] || "bg-gray-100 text-gray-700"}`}
+                                                        disabled={updatingStatus === issue._id}
+                                                    >
+                                                        {updatingStatus === issue._id ? (
+                                                            <FaSpinner className="animate-spin" size={10} />
+                                                        ) : (
+                                                            <>
+                                                                {issue.status}
+                                                                <FaChevronDown size={8} />
+                                                            </>
+                                                        )}
+                                                    </button>
+
+                                                    {statusDropdownOpen === issue._id && (
+                                                        <div className="absolute z-10 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+                                                            {statusOptions.map((status) => (
+                                                                <button
+                                                                    key={status}
+                                                                    onClick={() => handleStatusUpdate(issue._id, status)}
+                                                                    className={`w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 transition-colors ${status === issue.status ? 'bg-gray-50 font-medium' : ''
+                                                                        }`}
+                                                                >
+                                                                    <span className={`px-2 py-0.5 rounded-full ${statusBadge[status]}`}>
+                                                                        {status}
+                                                                    </span>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-4 py-3 text-gray-600">
                                                 {issue.createdAt ? new Date(issue.createdAt).toLocaleDateString('en-GB') : '—'}
@@ -380,7 +470,10 @@ const IssueList = () => {
                                             <td className="px-4 py-3">
                                                 <div className="flex justify-center gap-3">
                                                     <button
-                                                        onClick={() => handleEditClick(issue)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleEditClick(issue);
+                                                        }}
                                                         className="text-blue-600 transition-colors"
                                                         title="Edit"
                                                     >
@@ -388,7 +481,10 @@ const IssueList = () => {
                                                     </button>
                                                     {currentUser.role === 'Admin' && (
                                                         <button
-                                                            onClick={() => handleDelete(issue._id)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDelete(issue._id);
+                                                            }}
                                                             className="text-red-600 transition-colors"
                                                             title="Delete"
                                                         >
@@ -480,6 +576,19 @@ const IssueList = () => {
                 saving={saving}
                 onSave={() => handleEditIssue(editingId)}
                 categories={categories}
+            />
+
+            {/* View Details */}
+            <IssueDetailModal
+                isOpen={showDetailModal}
+                onClose={() => {
+                    setShowDetailModal(false);
+                    setSelectedIssue(null);
+                }}
+                issue={selectedIssue}
+                loading={loadingDetail}
+                statusBadge={statusBadge}
+                priorityBadge={priorityBadge}
             />
         </div>
     );

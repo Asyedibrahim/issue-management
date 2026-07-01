@@ -92,6 +92,70 @@ export const updateIssue = async (req, res) => {
     }
 };
 
+export const updateIssueStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        // Validate status
+        const validStatuses = ['Open', 'In Progress', 'Resolved'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid status value'
+            });
+        }
+
+        const updatedIssue = await Issue.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedIssue) {
+            return res.status(404).json({
+                success: false,
+                message: 'Issue not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Status updated successfully',
+            issue: updatedIssue
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+export const getIssueById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const issue = await Issue.findById(id);
+
+        if (!issue) {
+            return res.status(404).json({
+                success: false,
+                message: 'Issue not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            issue
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 export const deleteIssue = async (req, res) => {
     try {
         const issue = await Issue.findByIdAndDelete(req.params.id);
