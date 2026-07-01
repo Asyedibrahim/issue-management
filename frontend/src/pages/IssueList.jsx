@@ -120,10 +120,15 @@ const IssueList = () => {
     const handleCreateIssue = async () => {
         setCreating(true);
         try {
-            const response = await axios.post('/api/issue/create', createFormData, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+
+            const formDataToSend = new FormData();
+
+            Object.keys(createFormData).forEach((key) => {
+                formDataToSend.append(key, createFormData[key]);
+            });
+
+            const response = await axios.post('/api/issue/create', formDataToSend, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
 
             if (response.status === 201) {
@@ -159,7 +164,8 @@ const IssueList = () => {
             priority: issue.priority || '',
             machineName: issue.machineName || '',
             status: issue.status || '',
-            reportedBy: issue.reportedBy || ''
+            reportedBy: issue.reportedBy || '',
+            document: issue.document || ''
         });
         setShowEditModal(true);
     };
@@ -167,10 +173,15 @@ const IssueList = () => {
     const handleEditIssue = async (id) => {
         setSaving(true);
         try {
-            const response = await axios.put(`/api/issue/${id}`, editFormData, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+
+            const formDataToSend = new FormData();
+
+            Object.keys(editFormData).forEach((key) => {
+                formDataToSend.append(key, editFormData[key]);
+            });
+
+            const response = await axios.put(`/api/issue/${id}`, formDataToSend, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
 
             if (response.status === 200) {
@@ -467,7 +478,7 @@ const IssueList = () => {
                                             <td className="px-4 py-3 text-gray-600">
                                                 {issue.createdAt ? new Date(issue.createdAt).toLocaleDateString('en-GB') : '—'}
                                             </td>
-                                            <td className="px-4 py-3">
+                                            <td className="px-4 py-3 text-base">
                                                 <div className="flex justify-center gap-3">
                                                     <button
                                                         onClick={(e) => {

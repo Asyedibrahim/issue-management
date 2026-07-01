@@ -157,6 +157,54 @@ const EditIssueModal = ({
                                 {formData.description.length}/500 characters
                             </p>
                         </div>
+
+                        {formData.document?.url && (
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                                    Current Document
+                                </label>
+
+                                <div className="flex items-center gap-3">
+                                    {/* If image */}
+                                    {formData.document.url.match(/\.(jpg|jpeg|png|webp)$/i) ? (
+                                        <img
+                                            src={formData.document.url}
+                                            alt="document"
+                                            className="w-24 h-24 object-cover rounded-lg border"
+                                        />
+                                    ) : (
+                                        /* If PDF */
+                                        <a
+                                            href={formData.document.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-blue-600 underline text-sm"
+                                        >
+                                            View PDF
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Upload New Document */}
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                                Replace Document
+                            </label>
+
+                            <input
+                                type="file"
+                                accept="image/*,.pdf"
+                                onChange={(e) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        document: e.target.files[0],
+                                    }))
+                                }
+                                className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-black file:text-white hover:file:bg-gray-800 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-black/10"
+                            />
+                        </div>
                     </div>
                 </div>
 

@@ -95,7 +95,7 @@ const IssueDetailModal = ({
                                 </div>
                             </div>
 
-                            <div className="mt-6 pt-6 border-t border-gray-200">
+                            <div className="mt-6 pt-6 border-t border-gray-200 mb-5">
                                 <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Description</label>
                                 <div className="mt-2 p-4 bg-gray-50 rounded-lg">
                                     <p className="text-sm text-gray-700 whitespace-pre-wrap">
@@ -103,6 +103,31 @@ const IssueDetailModal = ({
                                     </p>
                                 </div>
                             </div>
+
+                            {issue.document?.url ? (
+                                issue.document.url.includes(".pdf") ? (
+                                    <div
+                                        onClick={() => window.open(issue.document.url, "_blank")}
+                                        className="w-full h-40 border border-gray-400 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50 transition"
+                                    >
+                                        <div className="text-center">
+                                            <p className="text-sm font-medium text-gray-700">📄 PDF Document</p>
+                                            <p className="text-xs text-gray-500 mt-1">Click to view full file</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <img
+                                        src={issue.document.url}
+                                        alt="Issue Document"
+                                        className="w-full max-h-64 object-contain rounded-lg border border-gray-400 cursor-pointer"
+                                        onClick={() => window.open(issue.document.url, "_blank")}
+                                    />
+                                )
+                            ) : (
+                                <div className="w-full h-32 border border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                                    <p className="text-sm text-gray-500">No document available</p>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-16">

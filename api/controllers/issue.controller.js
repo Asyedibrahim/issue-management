@@ -1,8 +1,29 @@
 import Issue from "../models/issue.model.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const createIssue = async (req, res) => {
     try {
-        const issue = await Issue.create(req.body);
+
+        let documentData = {};
+
+        if (req.file) {
+            const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
+            const uploadRes = await cloudinary.uploader.upload(base64, {
+                folder: "issues",
+                resource_type: "auto",
+            });
+
+            documentData = {
+                url: uploadRes.secure_url,
+                public_id: uploadRes.public_id,
+            };
+        }
+
+        const issue = await Issue.create({
+            ...req.body,
+            document: documentData,
+        });
 
         res.status(201).json({
             success: true,
@@ -75,9 +96,39 @@ export const updateIssue = async (req, res) => {
             return res.status(404).json({ error: 'Issue not found' });
         }
 
+        let documentData = existingIssue.document;
+
+        if (req.file) {
+            // delete old file
+            if (existingIssue.document?.public_id) {
+                await cloudinary.uploader.destroy(
+                    existingIssue.document.public_id,
+                    {
+                        resource_type: existingIssue.document.resource_type,
+                    }
+                );
+            }
+
+            const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
+            const uploadRes = await cloudinary.uploader.upload(base64, {
+                folder: "issues",
+                resource_type: "auto",
+            });
+
+            documentData = {
+                url: uploadRes.secure_url,
+                public_id: uploadRes.public_id,
+                resource_type: uploadRes.resource_type,
+            };
+        }
+
         const updatedIssue = await Issue.findByIdAndUpdate(
             id,
-            req.body,
+            {
+                ...req.body,
+                document: documentData,
+            },
             { new: true, runValidators: true }
         );
 

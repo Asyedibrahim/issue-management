@@ -35,6 +35,11 @@ const issueSchema = new mongoose.Schema(
             enum: ["Open", "In Progress", "Resolved"],
             default: "Open",
         },
+
+        document: {
+            url: String,
+            public_id: String,
+        }
     },
     { timestamps: true }
 );

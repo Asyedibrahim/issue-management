@@ -162,6 +162,22 @@ const CreateProductModal = ({
                 {formData.description.length}/500 characters
               </p>
             </div>
+            {/* Document */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Attachment
+              </label>
+              <input
+                type="file"
+                name="document"
+                accept="image/*,.pdf"
+                onChange={(e) => setFormData({
+                  ...formData,
+                  document: e.target.files[0]
+                })}
+                className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-black file:text-white hover:file:bg-gray-800 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-black/10"
+              />
+            </div>
           </div>
         </div>
 
