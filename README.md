@@ -1,48 +1,290 @@
-Installation
+# Production Issue Tracking System
 
-1. Clone the repository
-git clone https://github.com/Asyedibrahim/MERN-Task
+A MERN Stack application to manage and track production issues in a manufacturing environment. The system allows Production Managers to report issues and Admins to monitor, update, and resolve them.
 
-2. Installation
-npm i
+---
+
+## Features
+
+- User Login (Admin / Production Manager)
+- Dashboard
+- Add New Issue
+- Edit Issue
+- Delete Issue
+- Update Issue Status
+- Search Issues
+- Filter by Category
+- Responsive UI
+- JWT Authentication
+- MongoDB Database
+
+---
+
+## Tech Stack
+
+### Frontend
+
+- React
+- React Router DOM
+- Redux Toolkit
+- Tailwind CSS
+- React Icons
+- React Toastify
+- SweetAlert2
+
+### Backend
+
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT
+- bcryptjs
+- Cookie Parser
+
+---
+
+# Installation
+
+## 1. Clone the repository
+
+```bash
+git clone https://github.com/Asyedibrahim/issue-management.git
+```
+
+---
+
+## 2. Install Dependencies
+
+### Backend
+
+```bash
+npm install
+```
+
+### Frontend
+
+```bash
 cd frontend
-npm i
+npm install
+```
 
-3. Set up environment variables
-Create a .env file in the root directory with the following variables:
-MONGODB_URI=mongodb://localhost:27017/product-management
-JWT_SECRET=your_jwt_secret
+---
 
-4. Start MongoDB
-Make sure MongoDB is running on your system:
+## 3. Environment Variables
 
-# Development mode
+Create a `.env` file inside the **server** folder.
+
+```env
+MONGO_URI=mongodb://127.0.0.1:27017/production_issue_db
+
+JWT_SECRET=your_secret_key
+```
+
+---
+
+## 4. Start MongoDB
+
+Make sure MongoDB is running on your machine.
+
+---
+
+## 5. Run the Backend
+
+```bash
 npm run dev
+```
+
+---
+
+## 6. Run the Frontend
+
+```bash
+cd frontend
+npm run dev
+```
+
+Frontend
+
+```
+http://localhost:5173
+```
+
+Backend
+
+```
+http://localhost:4100
+```
+
+---
+
+# Folder Structure
+
+```
+Production-Issue-System/
+
+client/
+│
+├── src
+│   ├── components
+│   ├── pages
+│   ├── redux
+│   ├── utils
+│   └── App.jsx
+│
+server/
+│
+├── controllers
+├── models
+├── routes
+├── utils
+├── index.js
+└── .env
+```
+
+---
+
+# User Roles
+
+## Admin
+
+- View Dashboard
+- View Issues
+- Edit Issue
+- Delete Issue
+- Update Status
+
+## Production Manager
+
+- View Dashboard
+- Create Issue
+- View Issues
+
+---
+
+# Dashboard
+
+The dashboard displays:
+
+- Total Issues
+- Open Issues
+- In Progress Issues
+- Resolved Issues
+
+---
 
 # API Endpoints
-Method	        Endpoint	                    Description
-GET	        /api/products/search	            Get products with pagination and filters
-GET	        /api/products/categories	        Get all product categories
-POST	    /api/products/import	            Import products from CSV
-PUT	        /api/products/update-multiple	    Update multiple products at once
-GET	        /api/products/export	            Export products to CSV
-PUT	        /api/products/:id	                Update a specific product
-DELETE	    /api/products/:id	                Delete a specific product
-GET	        /api/products/:id/history	        Get stock history for a product
 
-# CSV Format
-The import CSV should have the following columns:
+## Authentication
 
-name (required): Product name
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| POST | `/api/users/login` | Login User |
 
-unit: Measurement unit
+---
 
-category: Product category
+## Dashboard
 
-brand: Product brand
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/api/dashboard/stats` | Dashboard Statistics |
 
-stock: Quantity in stock (number)
+---
 
-status: Stock status (In Stock/Out of Stock)
+## Issues
 
-image: URL to product image
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/api/issue/search` | Get All Issues |
+| POST | `/api/issue/create` | Create New Issue |
+| PUT | `/api/issue/:id` | Update Issue |
+| DELETE | `/api/issue/:id` | Delete Issue |
+
+---
+
+# Issue Schema
+
+```javascript
+{
+    title: String,
+    category: String,
+    description: String,
+    priority: String,
+    machineName: String,
+    reportedBy: String,
+    status: String
+}
+```
+
+---
+
+# User Schema
+
+```javascript
+{
+    email: String,
+    password: String,
+    role: "Admin" | "Production Manager"
+}
+```
+
+---
+
+# Default Status
+
+```
+Open
+In Progress
+Resolved
+```
+
+---
+
+# Categories
+
+Issue categories are managed dynamically from the database. Admin can create, update, and use categories without modifying the application code.
+
+Examples of categories include:
+
+- Machine Breakdown
+- Quality Issue
+- Raw Material
+- Maintenance
+
+> **Note:** These are sample categories. The available categories depend on the data stored in the database.
+
+# Priority Levels
+
+- Low
+- Medium
+- High
+
+---
+
+# Authentication
+
+- JWT
+- HTTP Only Cookies
+- Protected Routes
+- Role Based Authorization
+
+---
+
+# Future Improvements
+
+- Issue Comments
+- Assign Issues to Employees
+- Email Notifications
+- Charts & Analytics
+- Issue Attachments
+- Export Reports
+- Activity Logs
+
+---
+
+# Author
+
+**Syed Ibrahim**
+
+GitHub:
+https://github.com/Asyedibrahim
