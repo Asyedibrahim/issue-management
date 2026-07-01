@@ -14,18 +14,21 @@ import { MdPendingActions } from "react-icons/md";
 import { toast } from "react-toastify";
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function Stats() {
 
     const navigate = useNavigate()
+    const { currentUser } = useSelector((state) => state.user)
+
     const [stats, setStats] = useState({
         totalIssues: 0,
         openIssues: 0,
         progressIssues: 0,
         resolvedIssues: 0,
         recentIssues: [],
-        recentUsers: [],
     });
+    const [recentUsers ,setRecentUsers] = useState([]);
 
     const [loading, setLoading] = useState(true);
 
@@ -38,6 +41,12 @@ export default function Stats() {
             setLoading(true);
             const res = await axios.get("/api/dashboard/stats");
             setStats(res.data);
+
+            if (currentUser?.role === "Admin") {
+                const res = await axios.get("/api/users/recent-users");
+                setRecentUsers(res.data);
+            }
+
         } catch (error) {
             console.log(error);
             toast.error("Failed to load stats");
@@ -209,62 +218,64 @@ export default function Stats() {
                     </div>
 
                     {/* Recent Users */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                <FaUser className="text-gray-600" />
-                                Recent Users
-                            </h3>
-                            <button
-                                type="button"
-                                onClick={() => navigate('/dashboard?tab=users')}
-                                className="text-xs text-gray-500 hover:underline"
-                            >
-                                View All
-                            </button>
-                        </div>
+                    {currentUser.role === 'Admin' && (
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                    <FaUser className="text-gray-600" />
+                                    Recent Users
+                                </h3>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/dashboard?tab=users')}
+                                    className="text-xs text-gray-500 hover:underline"
+                                >
+                                    View All
+                                </button>
+                            </div>
 
-                        {loading ? (
-                            <div className="space-y-3">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                    <div key={i} className="animate-pulse">
-                                        <div className="h-16 bg-gray-100 rounded-lg"></div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : stats.recentUsers.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
-                                <p>No recent users</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
-                                {stats.recentUsers.map((user) => (
-                                    <div
-                                        key={user._id}
-                                        className="border border-gray-100 rounded-lg p-3 hover:bg-gray-50 transition-colors"
-                                    >
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                                                    <FaEnvelope className="text-gray-400" size={12} />
-                                                    {user.email}
-                                                </p>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${roleBadge[user.role] || "bg-gray-100 text-gray-700"}`}>
-                                                        {user.role}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <span className="text-xs text-gray-400 whitespace-nowrap ml-2 flex items-center gap-1">
-                                                <FaCalendarAlt size={10} />
-                                                {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
-                                            </span>
+                            {loading ? (
+                                <div className="space-y-3">
+                                    {[1, 2, 3, 4, 5].map((i) => (
+                                        <div key={i} className="animate-pulse">
+                                            <div className="h-16 bg-gray-100 rounded-lg"></div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                                    ))}
+                                </div>
+                            ) : recentUsers.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    <p>No recent users</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {recentUsers.map((user) => (
+                                        <div
+                                            key={user._id}
+                                            className="border border-gray-100 rounded-lg p-3 hover:bg-gray-50 transition-colors"
+                                        >
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                                                        <FaEnvelope className="text-gray-400" size={12} />
+                                                        {user.email}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${roleBadge[user.role] || "bg-gray-100 text-gray-700"}`}>
+                                                            {user.role}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <span className="text-xs text-gray-400 whitespace-nowrap ml-2 flex items-center gap-1">
+                                                    <FaCalendarAlt size={10} />
+                                                    {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -118,6 +118,21 @@ export const deleteUser = async (req, res) => {
     }
 };
 
+export const getRecentUsers = async (req, res) => {
+    try {
+        const users = await User.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .select('email role createdAt');
+
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 export const signout = (req, res, next) => {
     try {
         res.clearCookie('access_token').status(200).json('User Logged out!')

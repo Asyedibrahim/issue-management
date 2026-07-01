@@ -51,7 +51,7 @@ export default function LgSideBar() {
     };
 
     const navItems = [
-        { to: '/dashboard?tab=stats', tab: 'stats', label: 'Stats', icon: MdDashboard, adminOnly: true },
+        { to: '/dashboard?tab=stats', tab: 'stats', label: 'Stats', icon: MdDashboard, adminOnly: false },
         { to: '/dashboard?tab=issues', tab: 'issues', label: 'Issues', icon: MdSyncProblem, adminOnly: false },
         { to: '/dashboard?tab=users', tab: 'users', label: 'Users', icon: MdPerson, adminOnly: true },
         { to: '/dashboard?tab=categories', tab: 'categories', label: 'Categories', icon: MdCategory, adminOnly: true },

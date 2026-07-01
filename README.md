@@ -31,6 +31,7 @@ A MERN Stack application to manage and track production issues in a manufacturin
 - React Icons
 - React Toastify
 - SweetAlert2
+- Axiox
 
 ### Backend
 
@@ -76,7 +77,7 @@ npm install
 Create a `.env` file inside the **server** folder.
 
 ```env
-MONGO_URI=mongodb://127.0.0.1:27017/production_issue_db
+MONGO=mongodb://127.0.0.1:27017/production_issue_db
 
 JWT_SECRET=your_secret_key
 ```

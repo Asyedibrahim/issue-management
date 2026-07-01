@@ -1,5 +1,4 @@
 import Issue from "../models/issue.model.js";
-import User from "../models/user.model.js";
 
 export const getDashboard = async (req, res) => {
     try {
@@ -11,11 +10,7 @@ export const getDashboard = async (req, res) => {
             Issue.find()
                 .sort({ createdAt: -1 })
                 .limit(5)
-                .select('title machineName status category createdAt'),
-            User.find()
-                .sort({ createdAt: -1 })
-                .limit(5)
-                .select('email role createdAt')
+                .select('title machineName status category createdAt')
         ]);
 
         res.status(200).json({
@@ -23,8 +18,7 @@ export const getDashboard = async (req, res) => {
             openIssues,
             progressIssues,
             resolvedIssues,
-            recentIssues,
-            recentUsers
+            recentIssues
         });
     } catch (error) {
         res.status(500).json({

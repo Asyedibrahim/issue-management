@@ -24,7 +24,7 @@ export default function Dashboard() {
     if (tabFromUrl) {
       setTab(tabFromUrl);
     } else {
-      navigate('/dashboard?tab=issues');
+      navigate('/dashboard?tab=stats');
     }
   }, [location.search, navigate]);
 
@@ -42,7 +42,7 @@ export default function Dashboard() {
       </div>
 
       {tab === 'issues' && <IssueList />}
-      {tab === 'stats' && currentUser?.role === 'Admin' && <Stats />}
+      {tab === 'stats' && <Stats />}
       {tab === 'users' && currentUser?.role === 'Admin' && <UserList />}
       {tab === 'categories' && currentUser?.role === 'Admin' && <CategoryList />}
 
