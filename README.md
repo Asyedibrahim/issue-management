@@ -80,6 +80,11 @@ Create a `.env` file inside the **server** folder.
 MONGO=mongodb://127.0.0.1:27017/production_issue_db
 
 JWT_SECRET=your_secret_key
+
+CLOUD_NAME=your_cloudinary_name
+CLOUD_API_KEY=your_cloudinary_api_key
+CLOUD_API_SECRET=your_cloudinary_api_secret
+
 ```
 
 ---
